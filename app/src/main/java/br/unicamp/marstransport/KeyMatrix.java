@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import java.security.KeyException;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 public class KeyMatrix<K, T> extends Matrix<T> {
     K[] rowKeys, colKeys;
@@ -62,5 +63,14 @@ public class KeyMatrix<K, T> extends Matrix<T> {
         t.colKeys = this.rowKeys;
         t.rowKeys = this.colKeys;
         return t;
+    }
+
+    public T get(K row, K col) {
+        int ridx, cidx;
+        ridx = Arrays.asList(rowKeys).indexOf(row);
+        cidx = Arrays.asList(colKeys).indexOf(col);
+        if (ridx == -1 || cidx == -1)
+            throw new NoSuchElementException("\"" + row.toString() + "\" is not a key.");
+        return get(ridx, cidx);
     }
 }

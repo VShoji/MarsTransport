@@ -110,4 +110,17 @@ public class Matrix<T> implements Iterable<T>, Cloneable {
     public Matrix<T> clone() {
         return new Matrix<T>(this);
     }
+
+    @NonNull
+    public Matrix<T> transpose() {
+        Matrix<T> t = new Matrix<T>(this.WIDTH, this.HEIGHT);
+        for (int i = 0; i < this.HEIGHT; i++) {
+            @SuppressWarnings("unchecked")
+            T[] row = (T[]) this.matrix[i];
+            for (int j = 0; j <this.WIDTH; j++) {
+                t.matrix[j][i] = row[j];
+            }
+        }
+        return t;
+    }
 }

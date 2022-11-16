@@ -1,5 +1,7 @@
 package br.unicamp.marstransport;
 
+import androidx.annotation.NonNull;
+
 import java.security.KeyException;
 import java.util.Arrays;
 
@@ -51,5 +53,14 @@ public class KeyMatrix<K, T> extends Matrix<T> {
 
             repeats[i++] = k;
         }
+    }
+
+    @NonNull
+    @Override
+    public KeyMatrix<K, T> transpose() {
+        KeyMatrix<K, T> t = (KeyMatrix<K, T>) super.transpose();
+        t.colKeys = this.rowKeys;
+        t.rowKeys = this.colKeys;
+        return t;
     }
 }

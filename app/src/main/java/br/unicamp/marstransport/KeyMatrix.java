@@ -1,12 +1,15 @@
 package br.unicamp.marstransport;
 
+import androidx.annotation.NonNull;
+
 import java.security.KeyException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 public class KeyMatrix<K, T> extends Matrix<T> {
     K[] rowKeys, colKeys;
 
-    // TODO: Change .length to .count()
     public KeyMatrix(K[] rowKeys, K[] colKeys) throws KeyException {
         super(rowKeys.length, colKeys.length);
         setRowKeys(rowKeys);
@@ -39,17 +42,35 @@ public class KeyMatrix<K, T> extends Matrix<T> {
 
     private void checkKeyIntegrity(K[] keys) throws KeyException {
         @SuppressWarnings("unchecked")
-        K[] repeats = (K[]) new Object[keys.length];
+        ArrayList<K> repeats = new ArrayList<K>(keys.length);
         int i = 0;
 
         for (K k : keys) {
             if (k == null)
                 throw new NullPointerException();
 
-            if (Arrays.stream(repeats).anyMatch(k::equals))
+            if (repeats.contains(k))
                 throw new KeyException("Key already present");
 
-            repeats[i++] = k;
+            repeats.add(k);
         }
+    }
+
+    @NonNull
+    @Override
+    public KeyMatrix<K, T> transpose() {
+        KeyMatrix<K, T> t = (KeyMatrix<K, T>) super.transpose();
+        t.colKeys = this.rowKeys;
+        t.rowKeys = this.colKeys;
+        return t;
+    }
+
+    public T get(K row, K col) {
+        int ridx, cidx;
+        ridx = Arrays.asList(rowKeys).indexOf(row);
+        cidx = Arrays.asList(colKeys).indexOf(col);
+        if (ridx == -1 || cidx == -1)
+            throw new NoSuchElementException("\"" + row.toString() + "\" is not a key.");
+        return get(ridx, cidx);
     }
 }

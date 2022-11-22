@@ -1,10 +1,11 @@
-package br.unicamp.marstransport;
+package br.unicamp.marstransport.dataStructures.matrices;
 
 import androidx.annotation.NonNull;
 
 import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 public class KeyMatrix<K, T> extends Matrix<T> {
@@ -17,7 +18,13 @@ public class KeyMatrix<K, T> extends Matrix<T> {
     }
 
     public KeyMatrix(K[] keys) throws KeyException {
-        super(keys.length, keys.length);
+        super(keys.length);
+        setRowKeys(keys);
+        setColKeys(keys);
+    }
+
+    public KeyMatrix(List<K> keys) throws KeyException{
+        super(keys.size());
         setRowKeys(keys);
         setColKeys(keys);
     }
@@ -40,6 +47,18 @@ public class KeyMatrix<K, T> extends Matrix<T> {
         this.colKeys = colKeys;
     }
 
+    public void setRowKeys(List<K> rowKeys) throws KeyException {
+        @SuppressWarnings("unchecked")
+        K[] keys = (K[]) rowKeys.stream().toArray(Object[] :: new);
+        setRowKeys(keys);
+    }
+
+    public void setColKeys(List<K> colKeys) throws KeyException {
+        @SuppressWarnings("unchecked")
+        K[] keys = (K[]) colKeys.stream().toArray(Object[] :: new);
+        setColKeys(keys);
+    }
+
     private void checkKeyIntegrity(K[] keys) throws KeyException {
         @SuppressWarnings("unchecked")
         ArrayList<K> repeats = new ArrayList<K>(keys.length);
@@ -60,8 +79,8 @@ public class KeyMatrix<K, T> extends Matrix<T> {
     @Override
     public KeyMatrix<K, T> transpose() {
         KeyMatrix<K, T> t = (KeyMatrix<K, T>) super.transpose();
-        t.colKeys = this.rowKeys;
-        t.rowKeys = this.colKeys;
+        t.colKeys = this.rowKeys.clone();
+        t.rowKeys = this.colKeys.clone();
         return t;
     }
 

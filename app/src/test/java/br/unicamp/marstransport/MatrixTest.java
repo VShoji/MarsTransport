@@ -8,6 +8,8 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import br.unicamp.marstransport.dataStructures.matrices.Matrix;
+
 /**
  * Example local unit test, which will execute on the development machine (host).
  *

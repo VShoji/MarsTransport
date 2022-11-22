@@ -1,4 +1,4 @@
-package br.unicamp.marstransport;
+package br.unicamp.marstransport.dataStructures.matrices;
 
 import androidx.annotation.NonNull;
 
@@ -118,6 +118,7 @@ public class Matrix<T> implements Iterable<T>, Cloneable {
             @SuppressWarnings("unchecked")
             T[] row = (T[]) this.matrix[i];
             for (int j = 0; j <this.WIDTH; j++) {
+                // TODO: Clone the elements here
                 t.matrix[j][i] = row[j];
             }
         }

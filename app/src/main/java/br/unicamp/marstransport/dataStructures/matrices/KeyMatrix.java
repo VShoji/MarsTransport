@@ -20,13 +20,13 @@ public class KeyMatrix<K, T> extends Matrix<T> {
     public KeyMatrix(K[] keys) throws KeyException {
         super(keys.length);
         setRowKeys(keys);
-        setColKeys(keys);
+        this.colKeys = keys;
     }
 
     public KeyMatrix(List<K> keys) throws KeyException{
         super(keys.size());
         setRowKeys(keys);
-        setColKeys(keys);
+        this.colKeys = keys;
     }
 
     public K[] getRowKeys() {
@@ -84,12 +84,21 @@ public class KeyMatrix<K, T> extends Matrix<T> {
         return t;
     }
 
-    public T get(K row, K col) {
+    public T getValue(K row, K col) {
         int ridx, cidx;
         ridx = Arrays.asList(rowKeys).indexOf(row);
         cidx = Arrays.asList(colKeys).indexOf(col);
         if (ridx == -1 || cidx == -1)
             throw new NoSuchElementException("\"" + row.toString() + "\" is not a key.");
-        return get(ridx, cidx);
+        return super.getValue(ridx, cidx);
+    }
+
+    public void setValue(T value, K row, K col) {
+        int ridx, cidx;
+        ridx = Arrays.asList(rowKeys).indexOf(row);
+        cidx = Arrays.asList(colKeys).indexOf(col);
+        if (ridx == -1 || cidx == -1)
+            throw new NoSuchElementException("\"" + row.toString() + "\" is not a key.");
+        super.setValue(ridx, cidx);
     }
 }

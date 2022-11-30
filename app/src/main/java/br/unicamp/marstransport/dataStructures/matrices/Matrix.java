@@ -35,13 +35,13 @@ public class Matrix<T> implements Iterable<T>, Cloneable {
         this.WIDTH  = other.WIDTH;
     }
 
-    public T get(int row, int col) {
+    public T getValue(int row, int col) {
         @SuppressWarnings("unchecked")
         T ret = (T) matrix[row][col];
         return ret;
     }
 
-    public void set(T value, int row, int col) {
+    public void setValue(T value, int row, int col) {
         matrix[row][col] = value;
     }
 

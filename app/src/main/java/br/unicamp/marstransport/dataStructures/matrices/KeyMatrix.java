@@ -26,7 +26,7 @@ public class KeyMatrix<K, T> extends Matrix<T> {
     public KeyMatrix(List<K> keys) throws KeyException{
         super(keys.size());
         setRowKeys(keys);
-        this.colKeys = keys;
+        this.colKeys = (K[]) keys.stream().toArray(Object[] :: new);
     }
 
     public K[] getRowKeys() {
@@ -60,7 +60,6 @@ public class KeyMatrix<K, T> extends Matrix<T> {
     }
 
     private void checkKeyIntegrity(K[] keys) throws KeyException {
-        @SuppressWarnings("unchecked")
         ArrayList<K> repeats = new ArrayList<K>(keys.length);
         int i = 0;
 
@@ -99,6 +98,6 @@ public class KeyMatrix<K, T> extends Matrix<T> {
         cidx = Arrays.asList(colKeys).indexOf(col);
         if (ridx == -1 || cidx == -1)
             throw new NoSuchElementException("\"" + row.toString() + "\" is not a key.");
-        super.setValue(ridx, cidx);
+        super.setValue(value, ridx, cidx);
     }
 }

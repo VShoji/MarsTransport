@@ -87,7 +87,7 @@ public class Matrix<T> implements Iterable<T>, Cloneable {
 
             @Override
             public T next() {
-                T ret = get(row, col);
+                T ret = getValue(row, col);
                 col++;
                 return ret;
             }

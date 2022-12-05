@@ -15,7 +15,7 @@ public class AdjacencyMatrixGraph<T> {
     private KeyMatrix<T, Double> adjacencyMatrix;
     public final int ORDER;
 
-    public static enum Algorithm {
+    public enum Algorithm {
         DIJKSTRA,
         BACKTRACKING
     }
@@ -37,8 +37,11 @@ public class AdjacencyMatrixGraph<T> {
         return new DijkstrasAlgorithm(adjacencyMatrix).run(start, destination);
     }
 
-    public LinkedList<T> getShortestPath(T start, T dest, Algorithm algorithm) {
-        throw new NotImplementedError();
+    public LinkedList<T> getShortestPath(T start, T destination, Algorithm algorithm) throws Exception {
+        if (algorithm.equals(Algorithm.DIJKSTRA))
+            return new DijkstrasAlgorithm(adjacencyMatrix).run(start, destination);
+        if (algorithm.equals(Algorithm.BACKTRACKING))
+            throw new NotImplementedError();
     }
 
     private class DijkstrasAlgorithm {
@@ -66,6 +69,7 @@ public class AdjacencyMatrixGraph<T> {
 
             @Override
             public boolean equals(Object o) {
+                if (o == null) return false;
                 if (this == o) return true;
                 Node node1 = (Node) o;
                 return node.equals(node1.node);
@@ -94,14 +98,17 @@ public class AdjacencyMatrixGraph<T> {
         public LinkedList<T> run(T start, T destination) throws Exception {
             Node currentNode = new Node(start, 0);
 
-            while (!notVisited.isEmpty() && currentNode.equals(new Node(destination))) {
-                Node nextNode = new Node(Double.MAX_VALUE);
+            while (!notVisited.isEmpty() && !currentNode.equals(new Node(destination))) {
+                Node nextNode = minNode();
 
                 for (Node node : notVisited) {
                     if (start.equals(node))
                         continue;
 
-                    Double weight = adjacencyMatrix.getValue(start, node.node);
+                    if (currentNode.equals(node))
+                        continue;
+
+                    Double weight = adjacencyMatrix.getValue(currentNode.node, node.node);
                     if (weight == null)
                         continue;
 
@@ -117,7 +124,10 @@ public class AdjacencyMatrixGraph<T> {
 
                 visited.add(currentNode);
                 notVisited.remove(currentNode);
-                currentNode = notVisited.get(notVisited.indexOf(nextNode));
+                int nextIndex = notVisited.indexOf(nextNode);
+                if (nextIndex == -1)
+                    continue;
+                currentNode = notVisited.get(nextIndex);
             }
 
             if (notVisited.isEmpty())
@@ -128,11 +138,18 @@ public class AdjacencyMatrixGraph<T> {
                 ret.addFirst(currentNode.node);
                 currentNode = currentNode.previous;
 
-                if (currentNode.previous == null) {
-                    ret.addFirst(currentNode.node);
+                if (currentNode == null)
                     break;
-                }
             }
+
+            return ret;
+        }
+
+        private Node minNode() {
+            Node ret = new Node(Double.MAX_VALUE);
+            for (Node node : notVisited)
+                if (node.compareTo(ret) < 0)
+                    ret = node;
 
             return ret;
         }

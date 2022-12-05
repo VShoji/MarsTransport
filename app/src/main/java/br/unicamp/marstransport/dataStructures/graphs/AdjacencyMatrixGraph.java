@@ -40,8 +40,8 @@ public class AdjacencyMatrixGraph<T> {
     public LinkedList<T> getShortestPath(T start, T destination, Algorithm algorithm) throws Exception {
         if (algorithm.equals(Algorithm.DIJKSTRA))
             return new DijkstrasAlgorithm(adjacencyMatrix).run(start, destination);
-        if (algorithm.equals(Algorithm.BACKTRACKING))
-            throw new NotImplementedError();
+
+        throw new NotImplementedError();
     }
 
     private class DijkstrasAlgorithm {

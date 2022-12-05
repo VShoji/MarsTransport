@@ -5,9 +5,11 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import br.unicamp.marstransport.dataStructures.graphs.AdjacencyMatrixGraph;
 import br.unicamp.marstransport.dataStructures.matrices.Matrix;
 
 /**
@@ -19,14 +21,14 @@ public class MatrixTest {
     Matrix<Integer> matrix;
 
     @Before
-    public void setup() {
+    public void setup() throws KeyException {
         matrix = new Matrix<Integer>(2, 3);
-        matrix.set(1, 0, 0);
-        matrix.set(2, 0, 1);
-        matrix.set(3, 0, 2);
-        matrix.set(4, 1, 0);
-        matrix.set(5, 1, 1);
-        matrix.set(6, 1, 2);
+        matrix.setValue(1, 0, 0);
+        matrix.setValue(2, 0, 1);
+        matrix.setValue(3, 0, 2);
+        matrix.setValue(4, 1, 0);
+        matrix.setValue(5, 1, 1);
+        matrix.setValue(6, 1, 2);
     }
 
     @Test

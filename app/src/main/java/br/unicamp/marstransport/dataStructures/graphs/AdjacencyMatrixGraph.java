@@ -1,7 +1,5 @@
 package br.unicamp.marstransport.dataStructures.graphs;
 
-import android.util.Pair;
-
 import androidx.annotation.NonNull;
 
 import java.security.KeyException;
@@ -13,104 +11,130 @@ import java.util.Objects;
 import br.unicamp.marstransport.dataStructures.matrices.KeyMatrix;
 import kotlin.NotImplementedError;
 
-public class AdjacencyMatrixGraph<K> {
-    private KeyMatrix<K, Double> matrix;
-    final private List<K> nodes;
+public class AdjacencyMatrixGraph<T> {
+    private KeyMatrix<T, Double> adjacencyMatrix;
     public final int ORDER;
 
     public static enum Algorithm {
-        DJIKSTRA,
+        DIJKSTRA,
         BACKTRACKING
     }
 
-    public AdjacencyMatrixGraph(@NonNull List<K> nodes) throws KeyException {
-        this.matrix = new KeyMatrix<K, Double>(nodes);
-        this.nodes = nodes;
-        this.ORDER = matrix.WIDTH;
+    public AdjacencyMatrixGraph(@NonNull List<T> nodes) throws KeyException {
+        this.adjacencyMatrix = new KeyMatrix<T, Double>(nodes);
+        this.ORDER = adjacencyMatrix.WIDTH;
     }
 
-    public double getWeight(K row, K col) {
-        return matrix.getValue(row, col);
+    public double getWeight(T row, T col) {
+        return adjacencyMatrix.getValue(row, col);
     }
 
-    public void setWeight(double weight, K row, K col) {
-        matrix.setValue(weight, row, col);
+    public void setWeight(double weight, T row, T col) {
+        adjacencyMatrix.setValue(weight, row, col);
     }
 
-    public LinkedList<K> getShortestPath(K start, K dest) {
-        return new DijkstrasAlgorithm().run(start, dest);
+    public LinkedList<T> getShortestPath(T start, T destination) throws Exception {
+        return new DijkstrasAlgorithm(adjacencyMatrix).run(start, destination);
     }
 
-    public LinkedList<K> getShortestPath(K start, K dest, Algorithm algorithm) {
+    public LinkedList<T> getShortestPath(T start, T dest, Algorithm algorithm) {
         throw new NotImplementedError();
     }
 
     private class DijkstrasAlgorithm {
-        private class Node implements Comparable<Node> {
-            public double value;
-            public boolean visited;
-            public int index;
+        KeyMatrix<T, Double> adjacencyMatrix;
+        ArrayList<Node> notVisited;
+        ArrayList<Node> visited;
 
-            public Node(double value, boolean visited, int index) {
-                this.value = value;
-                this.visited = visited;
-                this.index = index;
+        private class Node implements Comparable<Node>{
+            public T node;
+            public double weight;
+            public Node previous;
+
+            public Node(T node, double weight) {
+                this.node = node;
+                this.weight = weight;
             }
 
-            @Override
-            public int compareTo(Node o) {
-                return Double.compare(value, o.value);
+            public Node(T node) {
+                this.node = node;
+            }
+
+            public Node(double weight) {
+                this.weight = weight;
             }
 
             @Override
             public boolean equals(Object o) {
                 if (this == o) return true;
-                Node node = (Node) o;
-                return index == node.index;
+                Node node1 = (Node) o;
+                return node.equals(node1.node);
             }
 
             @Override
             public int hashCode() {
-                return Objects.hash(value, visited, index);
+                return Objects.hash(node);
+            }
+
+            @Override
+            public int compareTo(Node o) {
+                return Double.compare(weight, o.weight);
             }
         }
 
-        public LinkedList<K> run(K start, K dest) {
-            ArrayList<Node> distance = new ArrayList<Node>(matrix.WIDTH);
-            int startI = nodes.indexOf(start);
-            distance.set(startI, new Node(0d, true, startI));
-            return next(startI, nodes.indexOf(dest), distance, new LinkedList<Pair<Integer, Integer>>());
+        public DijkstrasAlgorithm(KeyMatrix<T, Double> adjacencyMatrix) {
+            this.adjacencyMatrix = adjacencyMatrix;
+            notVisited = new ArrayList<Node>(adjacencyMatrix.WIDTH);
+            visited = new ArrayList<Node>(adjacencyMatrix.WIDTH);
+
+            for (T node : adjacencyMatrix.getColKeys())
+                notVisited.add(new Node(node, Double.MAX_VALUE));
         }
 
-        private LinkedList<K> next(int current, int destination, ArrayList<Node> distance, LinkedList<Pair<Integer, Integer>> nextNodes) {
-            if (current == destination) {
-                LinkedList<K> ret = new LinkedList<K>();
-                ret.addFirst(nodes.get(current));
-                return ret;
-            }
+        public LinkedList<T> run(T start, T destination) throws Exception {
+            Node currentNode = new Node(start, 0);
 
-            for (int i = 0; i < ORDER; i++) {
-                if (current == i)
-                    continue;
+            while (!notVisited.isEmpty() && currentNode.equals(new Node(destination))) {
+                Node nextNode = new Node(Double.MAX_VALUE);
 
-                Double relDistance = matrix.getValue(current, i);
-                if (relDistance == null)
-                    continue;
+                for (Node node : notVisited) {
+                    if (start.equals(node))
+                        continue;
 
-                Node node = distance.get(i);
-                if (node == null)
-                    node = new Node(Double.MAX_VALUE, false, i);
+                    Double weight = adjacencyMatrix.getValue(start, node.node);
+                    if (weight == null)
+                        continue;
 
-                double calculated = distance.get(current).value + matrix.getValue(current, i);
-                if (calculated < node.value) {
-                    node.value = calculated;
-                    nextNodes.addLast(new Pair<Integer, Integer>(current, i));
+                    double nextWeight = currentNode.weight + weight;
+                    if (nextWeight < node.weight) {
+                        node.weight = nextWeight;
+                        node.previous = currentNode;
+                    }
+
+                    if (node.compareTo(nextNode) < 0)
+                        nextNode = node;
                 }
 
-                distance.set(i, node);
+                visited.add(currentNode);
+                notVisited.remove(currentNode);
+                currentNode = notVisited.get(notVisited.indexOf(nextNode));
             }
 
-            throw new NotImplementedError();
+            if (notVisited.isEmpty())
+                throw new Exception("Path not found");
+
+            LinkedList<T> ret = new LinkedList<T>();
+            for (;;) {
+                ret.addFirst(currentNode.node);
+                currentNode = currentNode.previous;
+
+                if (currentNode.previous == null) {
+                    ret.addFirst(currentNode.node);
+                    break;
+                }
+            }
+
+            return ret;
         }
     }
 }

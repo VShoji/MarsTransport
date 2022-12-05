@@ -19,7 +19,6 @@ import br.unicamp.marstransport.dataStructures.matrices.Matrix;
  */
 public class MatrixTest {
     Matrix<Integer> matrix;
-    AdjacencyMatrixGraph<Integer> graph;
 
     @Before
     public void setup() throws KeyException {
@@ -30,12 +29,6 @@ public class MatrixTest {
         matrix.setValue(4, 1, 0);
         matrix.setValue(5, 1, 1);
         matrix.setValue(6, 1, 2);
-
-        ArrayList<Integer> keys = new ArrayList<Integer>();
-        keys.add(1);
-        keys.add(2);
-        keys.add(3);
-        graph = new AdjacencyMatrixGraph<Integer>(keys);
     }
 
     @Test
